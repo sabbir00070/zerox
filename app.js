@@ -1,4 +1,3 @@
-import "./bot.js";
 import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
@@ -7,6 +6,8 @@ import { fileURLToPath } from "url";
 import { getUser, getPhoto } from './telegram.js';
 import axios from 'axios';
 import connectDB from './db.js';
+import User from "./Users.js";
+import "./bot.js";
 
 dotenv.config();
 await connectDB();

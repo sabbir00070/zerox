@@ -1,24 +1,11 @@
 import TelegramBot from "node-telegram-bot-api";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import User from "./Users.js";
 
 dotenv.config();
 
 await mongoose.connect(process.env.MONGO_DB);
-
-const userSchema = new mongoose.Schema({
-  chat_id: String,
-  coin: { type: Number, default: 100 },
-  rafer: { type: Number, default: 0 },
-  token: String,
-  isPremium: { type: Boolean, default: false },
-  endPremium: Date,
-  last_bonus: Date,
-  total_bom: { type: Number, default: 0 },
-  register_date: { type: Date, default: Date.now }
-});
-
-const User = mongoose.model("users", userSchema, "users");
 
 const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
 
@@ -60,6 +47,7 @@ const saveAndCheck = async (chatId, ref) => {
 
 const generateLink = async (chatId, name, messageId = null) => {
   const token = Buffer.from(`${Math.floor(Math.random() * 100)}_${chatId}`).toString("base64");
+
   await User.updateOne({ chat_id: chatId }, { token });
 
   const text =
