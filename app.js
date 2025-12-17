@@ -1,3 +1,4 @@
+import "./bot.js";
 import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
@@ -11,7 +12,7 @@ dotenv.config();
 await connectDB();
 
 const userSchema = new mongoose.Schema({}, { strict: false });
-const User = mongoose.model("users", userSchema, "users");
+//const User = mongoose.model("users", userSchema, "users");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
