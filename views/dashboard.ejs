@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title ? title : "ZEROX BOMBING" %></title>
+    <link rel="stylesheet" href="./fuck.css">
+    <link rel="icon" href="<%= icon %>" type="image/png" sizes="16x16">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        @font-face {
+            font-family: 'CCQuigglesmith-Bold';
+            src: url('CCQuigglesmith-Bold.otf') format('opentype');
+        }
+
+        .info-box {
+            font-family: 'CCQuigglesmith-Bold', sans-serif;
+        }
+    </style>
+
+</head>
+
+<% if(showMaintenance) {  %>
+
+<div class="maintanence snow-bg" style="
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f8fafc;
+  text-align: center;">
+  
+  <img src="https://xonaie69.xyz/m.png" alt="Server Offline" style="
+    width: 150px;
+    height: auto;
+    margin-bottom: 20px;" />
+  
+  <h1 style="
+    font-size: 2rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;">Server Currently Offline</h1>
+  
+  <p style="
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 20px;">We are performing some maintenance. Please check back shortly.</p>
+  
+  <button onclick="location.reload()" style="
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;">
+    Reload
+  </button>
+</div>
+<% } %>
+<body class="body snow-bg">
+    <div class="container">
+        <div class="profile-logo">
+          <img src="data:image/jpeg;base64, <%= photo %>" alt="Profile Photos">
+        </div>
+        <h1 class="m"><%= tgUser.first_name  %> <%= tgUser.last_name %></h1>
+        <div class="info-box">
+        <p>Username: <%= tgUser.username %></p>
+        <p>Chat ID: <%= chatId %></p>
+    </div>
+        <form method="post">
+            <label for="phone">নিচে আপনার নম্বর দিন</label>
+            <div class="phone-number">
+                <input type="tel" id="phone" name="phone" placeholder="01xxx" required>
+            </div>
+           <div class="uk-panel-box">
+        <button type="submit" name="attack" class="uk-button uk-button-large" onclick="playMusic()">Submit</button>
+    </div>
+
+    <audio id="music" src="Music.mp3" loop></audio>
+
+
+        </form>
+        <div class="coins">
+            <img src="assets/coins.png" alt="">
+            <p><%= user.coin %></p>
+        </div>
+
+            <p class="error-message"></p>
+</body>
+    <script>
+        function playMusic() {
+            const music = document.getElementById('music');
+            music.play();
+        }
+    </script>
+
+</html>
