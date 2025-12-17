@@ -72,6 +72,13 @@ app.get("/dashboard", async (req, res) => {
 
 app.get("/", (req, res) => res.redirect("/dashboard"));
 
+app.post("/api-send", (req, res) => {
+  res.json({
+    status: true,
+    message: "Succesfully message sent"
+  })
+});
+
 app.listen(PORT, () => console.log(`✅ Server running at http://localhost:${PORT}`));
 
 async function base64(photo) {

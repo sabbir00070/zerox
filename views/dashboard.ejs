@@ -33,10 +33,10 @@
         <form method="post">
             <label for="phone">নিচে আপনার নম্বর দিন</label>
             <div class="phone-number">
-                <input type="tel" id="phone" name="phone" placeholder="01xxx" required>
+                <input class="input-tel" type="tel" id="phone" name="phone" placeholder="01xxx" required>
             </div>
            <div class="uk-panel-box">
-        <button type="submit" name="attack" class="uk-button uk-button-large" onclick="playMusic()">Submit</button>
+        <button type="button" name="attack" class="send-btn uk-button uk-button-large" onclick="playMusic()">Submit</button>
     </div>
 
     <audio id="music" src="Music.mp3" loop></audio>
@@ -55,6 +55,43 @@
             const music = document.getElementById('music');
             music.play();
         }
+    </script>
+    <script>
+      const btn = document.querySelector(".send-btn");
+      const number = document.querySelector(".input-tel");
+      btn.addEventListener('click', async () => {
+        const iNumber = number.value.trim();
+        if(!iNumber) {
+          alert('Please enter phone number');
+        return
+        }
+        if(!/^01\d{9}$/.test(iNumber)) {
+          alert('Please solv the number format');
+          return;
+        }
+        btn.disabled = true;
+        btn.innerText = "Sending...";
+        try {
+          const res = await fetch("/api-send", {
+            method: "POST",
+            headers: {
+              "Content-type": "application/json"
+            },
+            body: JSON.stringify({ phone : iNumber })
+          });
+          const data = await res.json();
+          if(data.status === true) {
+            alert(data.message);
+          } else {
+            alert(data.message || "Failed");
+          }
+        } catch(err) {
+          alert(`Server error: ${err}`);
+        } finally {
+          btn.disabled = false;
+          btn.innerText = 'Submit';
+        }
+      });
     </script>
 
 </html>
