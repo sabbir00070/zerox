@@ -13,7 +13,6 @@ dotenv.config();
 await connectDB();
 
 const userSchema = new mongoose.Schema({}, { strict: false });
-//const User = mongoose.model("users", userSchema, "users");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -25,7 +24,8 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/dashboard", async (req, res) => {
-  const q = req.query.q;if (!q || q === '') {
+  const q = req.query.q;
+  if (!q || q === '') {
     return res.render("error", {
       title: "404 Error",
       message: "Token is missing or empty",
@@ -35,7 +35,13 @@ app.get("/dashboard", async (req, res) => {
   
   try {
     const users4 = await getUserByToken(q);
-    if (!users4) return res.status(404).send("User not found");
+    if (!users4) {
+      return res.render("error", {
+        title: "300",
+        message: "User not found",
+        description: "Please /start the bot then open."
+      });
+    }
 
     const chatId = users4.chat_id;
     const userData = await getUser(chatId);
