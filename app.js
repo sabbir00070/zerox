@@ -42,7 +42,7 @@ app.get("/dashboard", async (req, res) => {
 
     // Example maintenance object, you can fetch from DB later
     const maintenance = {
-      m_end_time: "2025-12-20T03:00:00"
+      m_end_time: "2026-12-20T03:00:00"
     };
 
     res.render("dashboard", {
