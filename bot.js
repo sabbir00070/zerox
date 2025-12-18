@@ -184,6 +184,23 @@ ${referralLink}
   bot.sendMessage(chatId, text);
 });
 
+bot.onText(/\/my-admin/, async (msg) => {
+  const chatId = msg.chat.id;
+
+  if (!process.env.ADMIN_URL) {
+    return bot.sendMessage(chatId, "⚠️ Admin URL is not configured. Please contact the developer.");
+  }
+
+  bot.sendMessage(chatId, "🔹 *Admin Panel Access*\n\nYou can manage users, view system stats, and configure settings using the admin panel. Click the button below to access it safely.", {
+    parse_mode: "Markdown",
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: "Open Admin Panel", url: process.env.ADMIN_URL }]
+      ]
+    }
+  });
+});
+
 bot.on("callback_query", async (q) => {
   const chatId = q.message.chat.id;
 
