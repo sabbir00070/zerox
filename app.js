@@ -110,11 +110,16 @@ app.post("/api-send", async (req, res) => {
     let left_coin = user.coin;
 
     if (apiData.status === true) {
-      const updatedUser = await User.findOneAndUpdate(
-        { token, coin: { $gte: 5 } },
-        { $inc: { coin: -5 } },
-        { new: true }
-      );
+const updatedUser = await User.findOneAndUpdate(
+  { token, coin: { $gte: 5 } },
+  {
+    $inc: {
+      coin: -5,
+      total_bom: +1
+    }
+  },
+  { new: true }
+);
 
       left_coin = updatedUser.coin;
 
