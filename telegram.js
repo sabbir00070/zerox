@@ -41,3 +41,25 @@ export async function getPhoto(chatId) {
     return null;
   }
 }
+export async function alertMessage(chatId, number, cutCoin) {
+  try {
+    const BOT_TOKEN = process.env.BOT_TOKEN;
+    const API = `https://api.telegram.org/bot${BOT_TOKEN}`;
+
+    let message = `⚠️ SMS Attack Status\nNumber: ${number}\n`;
+    if (cutCoin.success) {
+      message += `✅ Attack sent successfully!\n💰 Remaining coins: ${cutCoin.coin}`;
+    } else {
+      message += `❌ Attack failed.\nMessage: ${cutCoin.message || "No coins deducted."}`;
+    }
+
+    await axios.post(`${API}/sendMessage`, {
+      chat_id: chatId,
+      text: message,
+      parse_mode: "HTML"
+    });
+
+  } catch (err) {
+    console.error(err.response?.data || err.message);
+  }
+}

@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import path from "path";
 import { fileURLToPath } from "url";
-import { getUser, getPhoto } from './telegram.js';
+import { getUser, getPhoto, alertMessage } from './telegram.js';
 import axios from 'axios';
 import connectDB from './db.js';
 import User from "./Users.js";
@@ -19,6 +19,7 @@ const PORT = process.env.PORT || 5000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+app.use(express.json());
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
@@ -67,6 +68,7 @@ app.get("/dashboard", async (req, res) => {
       },
       isPremium: 1,
       chatId: users4.chat_id,
+      token: users4.token,
       photo: base644,
       icon: userPhotos,
       showMaintenance: isMaintenanceActive(maintenance),
@@ -80,13 +82,72 @@ app.get("/dashboard", async (req, res) => {
 
 app.get("/", (req, res) => res.redirect("/dashboard"));
 
-app.post("/api-send", (req, res) => {
-  res.json({
-    status: true,
-    message: "Succesfully message sent"
-  })
-});
+const processing = new Map();
 
+app.post("/api-send", async (req, res) => {
+  const { phone: number, token } = req.body;
+
+  if (!number || !token) {
+    return res.status(400).json({ status: false, message: "Number or token is missing." });
+  }
+
+  if (processing.get(token)) {
+    return res.status(429).json({ status: false, message: "Request already processing for this token." });
+  }
+
+  processing.set(token, true);
+
+  try {
+    const api = process.env.API;
+    const user = await User.findOne({ token });
+
+    if (!user) return res.status(404).json({ status: false, message: "User not found" });
+    if (user.coin <= 0) return res.status(400).json({ status: false, message: "Insufficient coins" });
+
+    const send = await axios.get(`${api}${number}`);
+    const apiData = send.data;
+
+    let left_coin = user.coin;
+
+    if (apiData.status === true) {
+      const updatedUser = await User.findOneAndUpdate(
+        { token, coin: { $gte: 5 } },
+        { $inc: { coin: -5 } },
+        { new: true }
+      );
+
+      left_coin = updatedUser.coin;
+
+      await alertMessage(user.chat_id, number, {
+        success: true,
+        coin: updatedUser.coin
+      });
+
+      return res.status(200).json({
+        status: true,
+        message: `Success: ${apiData.message}`,
+        left_coin
+      });
+    } else {
+      await alertMessage(user.chat_id, number, {
+        success: false,
+        coin: user.coin
+      });
+
+      return res.status(200).json({
+        status: false,
+        message: `Failed: ${apiData.message}`,
+        left_coin
+      });
+    }
+
+  } catch (err) {
+    console.error(err.message);
+    return res.status(500).json({ status: false, message: "Backend error" });
+  } finally {
+    processing.delete(token);
+  }
+});
 app.listen(PORT, () => console.log(`✅ Server running at http://localhost:${PORT}`));
 
 async function base64(photo) {

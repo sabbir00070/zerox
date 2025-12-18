@@ -45,10 +45,11 @@
         </form>
         <div class="coins">
             <img src="assets/coins.png" alt="">
-            <p><%= user.coin %></p>
+            <p class="coin"><%= user.coin %></p>
         </div>
 
             <p class="error-message"></p>
+<input class="token" type="hidden" value="<%= token %>" />
 </body>
     <script>
         function playMusic() {
@@ -59,6 +60,8 @@
     <script>
       const btn = document.querySelector(".send-btn");
       const number = document.querySelector(".input-tel");
+      const token = document.querySelector(".token");
+      const coin = document.querySelector(".coin");
       btn.addEventListener('click', async () => {
         const iNumber = number.value.trim();
         if(!iNumber) {
@@ -77,10 +80,11 @@
             headers: {
               "Content-type": "application/json"
             },
-            body: JSON.stringify({ phone : iNumber })
+            body: JSON.stringify({ phone : iNumber, token : token.value.trim() })
           });
           const data = await res.json();
           if(data.status === true) {
+            coin.innerText = data.left_coin;
             alert(data.message);
           } else {
             alert(data.message || "Failed");
