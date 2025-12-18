@@ -20,5 +20,18 @@
     "mongoose": "^9.0.1",
     "mysql2": "^3.15.3",
     "node-telegram-bot-api": "^0.67.0"
-  }
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.23",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sabbir00070/zerox.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sabbir00070/zerox/issues"
+  },
+  "homepage": "https://github.com/sabbir00070/zerox#readme"
 }

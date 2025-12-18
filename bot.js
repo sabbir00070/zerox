@@ -133,7 +133,10 @@ const statusInfo = async (chatId) => {
 bot.onText(/\/start(.*)/, async (msg, match) => {
   const chatId = msg.chat.id;
   const name = msg.from.first_name || "";
-  const ref = match[1]?.startsWith(" r_") ? match[1].replace(" r_", "") : null;
+  const payload = match[1]?.trim();
+  const ref = payload && payload.startsWith("r_")
+    ? payload.slice(2)
+    : null;
 
   await saveAndCheck(chatId, ref);
 

@@ -7,6 +7,7 @@ import { getUser, getPhoto, alertMessage } from './telegram.js';
 import axios from 'axios';
 import connectDB from './db.js';
 import User from "./Users.js";
+import { maintenanceGuard, maintenanceAPI } from "./helper/Maintenance.js";
 import "./bot.js";
 
 dotenv.config();
@@ -24,7 +25,7 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
 
-app.get("/dashboard", async (req, res) => {
+app.get("/dashboard", maintenanceGuard, async (req, res) => {
   const q = req.query.q;
   if (!q || q === '') {
     return res.render("error", {
@@ -33,7 +34,6 @@ app.get("/dashboard", async (req, res) => {
       description: "Please provide a valid token to access the dashboard."
     });
   }
-  
   try {
     const users4 = await getUserByToken(q);
     if (!users4) {
@@ -43,17 +43,10 @@ app.get("/dashboard", async (req, res) => {
         description: "Please /start the bot then open."
       });
     }
-
     const chatId = users4.chat_id;
     const userData = await getUser(chatId);
     const userPhotos = await getPhoto(chatId);
     const base644 = await base64(userPhotos);
-
-    // Example maintenance object, you can fetch from DB later
-    const maintenance = {
-      m_end_time: "2026-12-20T03:00:00"
-    };
-
     res.render("dashboard", {
       title: `${userData.username} Dashboard`,
       tgUser: {
@@ -84,7 +77,7 @@ app.get("/", (req, res) => res.redirect("/dashboard"));
 
 const processing = new Map();
 
-app.post("/api-send", async (req, res) => {
+app.post("/api-send", maintenanceAPI, async (req, res) => {
   const { phone: number, token } = req.body;
 
   if (!number || !token) {
@@ -166,9 +159,4 @@ async function getUserByToken(token) {
   } catch (e) {
     console.log(`getUserByToken: ${e}`);
   }
-}
-
-function isMaintenanceActive(maintenance) {
-  if (!maintenance || !maintenance.m_end_time) return false;
-  return new Date(maintenance.m_end_time) > new Date();
 }
