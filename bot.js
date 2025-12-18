@@ -165,6 +165,22 @@ bot.onText(/\/start(.*)/, async (msg, match) => {
 
 bot.onText(/\/status/, (msg) => statusInfo(msg.chat.id));
 
+bot.onText(/\/refarel/, async (msg) => {
+  const chatId = msg.chat.id;
+  const name = msg.from.first_name || "User";
+  const botUsername = process.env.BOT_USERNAME.replace("@", "");
+  const referralLink = `https://t.me/${botUsername}?start=r_${chatId}`;
+
+  const text = `✨ প্রিয় ${name}
+
+আপনার রেফারেল লিংক:  
+${referralLink}
+
+শেয়ার করুন এবং কয়েন অর্জন করুন! 🚀`;
+
+  bot.sendMessage(chatId, text);
+});
+
 bot.on("callback_query", async (q) => {
   const chatId = q.message.chat.id;
 
