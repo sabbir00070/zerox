@@ -22,7 +22,7 @@ export async function maintenanceGuard(req, res, next) {
 
   next();
 }
-export async function maintenanceAPI(req, res) {
+export async function maintenanceAPI(req, res, next) {
   const maintenance = await getMaintenance();
 
   if (isMaintenanceActive(maintenance)) {
@@ -35,5 +35,5 @@ export async function maintenanceAPI(req, res) {
     });
   }
 
-  return null;
+  next();
 }

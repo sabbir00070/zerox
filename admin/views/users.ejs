@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Users - Admin Panel</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Poppins', sans-serif; }
+
+  input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: #4b5563;
+    border-radius: 0.375rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    position: relative;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  input[type="checkbox"]:checked {
+    background-color: #10b981;
+  }
+
+  input[type="checkbox"]:checked::after {
+    content: '✔';
+    color: white;
+    font-size: 0.75rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+</style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen p-6">
+
+<div class="mb-6 text-center">
+  <h1 class="text-3xl sm:text-4xl font-bold text-red-500 tracking-wide mb-2">All Users</h1>
+  <p class="text-gray-400 text-sm sm:text-base">
+    Manage all registered users, their activity, and account privileges.
+  </p>
+</div>
+<div class="mb-6 text-gray-300 max-w-3xl mx-auto text-center text-sm sm:text-base">
+  This panel provides a full overview of users, including coins, premium/banned status, total bombs sent, referrer info, and registration date. Admins can quickly update or manage accounts.
+</div>
+
+<div class="overflow-x-auto shadow-xl rounded-2xl bg-gray-800/90 backdrop-blur-md p-4">
+  <table class="min-w-full border-collapse text-sm sm:text-base">
+    <thead class="bg-gray-700 text-gray-200 uppercase tracking-wide">
+      <tr>
+        <th class="p-3 text-left">Chat ID</th>
+        <th class="p-3 text-left">Coins</th>
+        <th class="p-3 text-left">Premium</th>
+        <th class="p-3 text-left">Banned</th>
+        <th class="p-3 text-left">Total Bombs</th>
+        <th class="p-3 text-left">Referrer</th>
+        <th class="p-3 text-left">Register Date</th>
+        <th class="p-3 text-left">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% users.forEach(user => { %>
+      <tr class="border-t border-gray-700 hover:bg-gray-700 transition">
+        <td class="p-3 break-words"><%= user.chat_id %></td>
+        <td class="p-3"><%= user.coin %></td>
+        <td class="p-3">
+          <input type="checkbox" <%= user.isPremium ? 'checked' : '' %> disabled>
+        </td>
+        <td class="p-3">
+          <input type="checkbox" <%= user.banned ? 'checked' : '' %> disabled>
+        </td>
+        <td class="p-3"><%= user.total_bom || 0 %></td>
+        <td class="p-3"><%= user.rafer || '-' %></td>
+        <td class="p-3"><%= user.register_date ? new Date(user.register_date).toLocaleDateString() : '-' %></td>
+        <td class="p-3">
+          <a href="/admin/users/<%= user._id %>" 
+             class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1 rounded-lg shadow transition flex items-center gap-1 justify-center">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 000-1.41l-2.34-2.34a1.003 1.003 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+            </svg>
+            Edit
+          </a>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<div class="mt-10 text-center text-gray-400 text-xs sm:text-sm tracking-widest">
+  ZEROX ADMIN PANEL • &copy; <%= new Date().getFullYear() %>
+</div>
+
+</body>
+</html>

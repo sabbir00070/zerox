@@ -8,7 +8,10 @@ import axios from 'axios';
 import connectDB from './db.js';
 import User from "./Users.js";
 import { maintenanceGuard, maintenanceAPI } from "./helper/Maintenance.js";
+import { checkBanByToken } from "./helper/UserController.js";
 import "./bot.js";
+import adminApp from "./admin/admin.js";
+
 
 dotenv.config();
 await connectDB();
@@ -24,8 +27,9 @@ app.use(express.json());
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/admin", adminApp);
 
-app.get("/dashboard", maintenanceGuard, async (req, res) => {
+app.get("/dashboard", maintenanceGuard, checkBanByToken, async (req, res) => {
   const q = req.query.q;
   if (!q || q === '') {
     return res.render("error", {
@@ -64,8 +68,6 @@ app.get("/dashboard", maintenanceGuard, async (req, res) => {
       token: users4.token,
       photo: base644,
       icon: userPhotos,
-      showMaintenance: isMaintenanceActive(maintenance),
-      maintenance
     });
   } catch (e) {
     console.error("Dashboard error:", e);
@@ -77,8 +79,9 @@ app.get("/", (req, res) => res.redirect("/dashboard"));
 
 const processing = new Map();
 
-app.post("/api-send", maintenanceAPI, async (req, res) => {
-  const { phone: number, token } = req.body;
+app.post("/api-send", maintenanceAPI, checkBanByToken, async (req, res) => {
+  const number = req.body.phone;
+  const token = req.body.q;
 
   if (!number || !token) {
     return res.status(400).json({ status: false, message: "Number or token is missing." });
