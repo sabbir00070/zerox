@@ -27,7 +27,7 @@ export async function getPhoto(chatId) {
       params: { user_id: chatId, limit: 1 }
     });
 
-    if (!photos.data.result.total_count) return null;
+    if (!photos.data.result.total_count) return "https://i.ibb.co/5WK8xX5Q/b9f9134cf3.jpg";
 
     const fileId = photos.data.result.photos[0][0].file_id;
 
