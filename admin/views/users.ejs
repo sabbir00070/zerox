@@ -6,95 +6,180 @@
 <title>Users - Admin Panel</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+
 <style>
-  body { font-family: 'Poppins', sans-serif; }
-
-  input[type="checkbox"] {
-    appearance: none;
-    -webkit-appearance: none;
-    background-color: #4b5563;
-    border-radius: 0.375rem;
-    width: 1.25rem;
-    height: 1.25rem;
-    position: relative;
-    cursor: pointer;
-    outline: none;
-    transition: all 0.2s;
-  }
-
-  input[type="checkbox"]:checked {
-    background-color: #10b981;
-  }
-
-  input[type="checkbox"]:checked::after {
-    content: '✔';
-    color: white;
-    font-size: 0.75rem;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
+body { font-family: 'Poppins', sans-serif; }
+input[type="checkbox"] {
+  appearance: none;
+  background-color: #4b5563;
+  border-radius: 0.375rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  position: relative;
+}
+input[type="checkbox"]:checked {
+  background-color: #10b981;
+}
+input[type="checkbox"]:checked::after {
+  content: '✔';
+  color: white;
+  font-size: 0.75rem;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
 </style>
 </head>
+
 <body class="bg-gray-900 text-gray-100 min-h-screen p-6">
 
-<div class="mb-6 text-center">
-  <h1 class="text-3xl sm:text-4xl font-bold text-red-500 tracking-wide mb-2">All Users</h1>
-  <p class="text-gray-400 text-sm sm:text-base">
-    Manage all registered users, their activity, and account privileges.
-  </p>
-</div>
-<div class="mb-6 text-gray-300 max-w-3xl mx-auto text-center text-sm sm:text-base">
-  This panel provides a full overview of users, including coins, premium/banned status, total bombs sent, referrer info, and registration date. Admins can quickly update or manage accounts.
-</div>
-
-<div class="overflow-x-auto shadow-xl rounded-2xl bg-gray-800/90 backdrop-blur-md p-4">
-  <table class="min-w-full border-collapse text-sm sm:text-base">
-    <thead class="bg-gray-700 text-gray-200 uppercase tracking-wide">
-      <tr>
-        <th class="p-3 text-left">Chat ID</th>
-        <th class="p-3 text-left">Coins</th>
-        <th class="p-3 text-left">Premium</th>
-        <th class="p-3 text-left">Banned</th>
-        <th class="p-3 text-left">Total Bombs</th>
-        <th class="p-3 text-left">Referrer</th>
-        <th class="p-3 text-left">Register Date</th>
-        <th class="p-3 text-left">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% users.forEach(user => { %>
-      <tr class="border-t border-gray-700 hover:bg-gray-700 transition">
-        <td class="p-3 break-words"><%= user.chat_id %></td>
-        <td class="p-3"><%= user.coin %></td>
-        <td class="p-3">
-          <input type="checkbox" <%= user.isPremium ? 'checked' : '' %> disabled>
-        </td>
-        <td class="p-3">
-          <input type="checkbox" <%= user.banned ? 'checked' : '' %> disabled>
-        </td>
-        <td class="p-3"><%= user.total_bom || 0 %></td>
-        <td class="p-3"><%= user.rafer || '-' %></td>
-        <td class="p-3"><%= user.register_date ? new Date(user.register_date).toLocaleDateString() : '-' %></td>
-        <td class="p-3">
-          <a href="/admin/users/<%= user._id %>" 
-             class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1 rounded-lg shadow transition flex items-center gap-1 justify-center">
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 000-1.41l-2.34-2.34a1.003 1.003 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-            </svg>
-            Edit
-          </a>
-        </td>
-      </tr>
-      <% }) %>
-    </tbody>
-  </table>
+<div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-8">
+  <div class="bg-gray-800 p-5 rounded-2xl text-center">
+    <p class="text-gray-400 text-sm">Total Users</p>
+    <h2 class="text-3xl font-bold text-white" id="statTotal">0</h2>
+  </div>
+  <div class="bg-gray-800 p-5 rounded-2xl text-center">
+    <p class="text-gray-400 text-sm">Premium Users</p>
+    <h2 class="text-3xl font-bold text-green-400" id="statPremium">0</h2>
+  </div>
+  <div class="bg-gray-800 p-5 rounded-2xl text-center">
+    <p class="text-gray-400 text-sm">Banned Users</p>
+    <h2 class="text-3xl font-bold text-red-400" id="statBanned">0</h2>
+  </div>
+  <div class="bg-gray-800 p-5 rounded-2xl text-center">
+    <p class="text-gray-400 text-sm">Total Bombs</p>
+    <h2 class="text-3xl font-bold text-indigo-400" id="statBombs">0</h2>
+  </div>
 </div>
 
-<div class="mt-10 text-center text-gray-400 text-xs sm:text-sm tracking-widest">
-  ZEROX ADMIN PANEL • &copy; <%= new Date().getFullYear() %>
+<div class="mb-6 bg-gray-800 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-4 gap-4">
+  <input id="searchChatId" placeholder="Search Chat ID" class="p-3 rounded-xl bg-gray-900 border border-gray-700">
+  <select id="filterPremium" class="p-3 rounded-xl bg-gray-900 border border-gray-700">
+    <option value="all">All Users</option>
+    <option value="premium">Premium</option>
+    <option value="free">Free</option>
+  </select>
+  <select id="filterBanned" class="p-3 rounded-xl bg-gray-900 border border-gray-700">
+    <option value="all">All Status</option>
+    <option value="banned">Banned</option>
+    <option value="active">Active</option>
+  </select>
+  <div class="flex gap-2">
+    <button onclick="exportCSV()" class="flex-1 bg-green-600 rounded-xl py-2">CSV</button>
+    <button onclick="exportPDF()" class="flex-1 bg-red-600 rounded-xl py-2">PDF</button>
+  </div>
 </div>
+
+<div class="overflow-x-auto bg-gray-800 rounded-2xl p-4">
+<table class="min-w-full text-sm">
+<thead class="bg-gray-700">
+<tr>
+<th class="p-3">Chat ID</th>
+<th class="p-3">Coins</th>
+<th class="p-3">Premium</th>
+<th class="p-3">Banned</th>
+<th class="p-3">Bombs</th>
+<th class="p-3">Referrer</th>
+<th class="p-3">Register Date</th>
+<th class="p-3">Action</th>
+</tr>
+</thead>
+<tbody id="usersTable">
+<% users.forEach(user => { %>
+<tr class="border-t border-gray-700">
+<td class="p-3 chat"><%= user.chat_id %></td>
+<td class="p-3"><%= user.coin %></td>
+<td class="p-3 premium"><input type="checkbox" <%= user.isPremium ? 'checked' : '' %> disabled></td>
+<td class="p-3 banned"><input type="checkbox" <%= user.banned ? 'checked' : '' %> disabled></td>
+<td class="p-3 bombs"><%= user.total_bom || 0 %></td>
+<td class="p-3"><%= user.rafer || '-' %></td>
+<td class="p-3"><%= user.register_date ? new Date(user.register_date).toLocaleDateString() : '-' %></td>
+<td class="p-3"><a href="/admin/users/<%= user._id %>" class="bg-indigo-600 px-3 py-1 rounded-lg">Edit</a></td>
+</tr>
+<% }) %>
+</tbody>
+</table>
+</div>
+
+<div class="flex justify-center gap-3 mt-6">
+<button onclick="prevPage()" class="px-4 py-2 bg-gray-700 rounded-lg">Prev</button>
+<span id="pageInfo" class="px-4 py-2"></span>
+<button onclick="nextPage()" class="px-4 py-2 bg-gray-700 rounded-lg">Next</button>
+</div>
+
+<script>
+let rows = [...document.querySelectorAll("#usersTable tr")]
+let filteredRows = [...rows]
+let page = 1
+const perPage = 10
+
+const searchInput = document.getElementById("searchChatId")
+const filterPremium = document.getElementById("filterPremium")
+const filterBanned = document.getElementById("filterBanned")
+
+function applyFilters() {
+  const search = searchInput.value.trim().toLowerCase()
+  const premium = filterPremium.value
+  const banned = filterBanned.value
+
+  filteredRows = rows.filter(row => {
+    const chat = row.querySelector(".chat").innerText.toLowerCase()
+    const isPremium = row.querySelector(".premium input").checked
+    const isBanned = row.querySelector(".banned input").checked
+
+    if (search && !chat.includes(search)) return false
+    if (premium === "premium" && !isPremium) return false
+    if (premium === "free" && isPremium) return false
+    if (banned === "banned" && !isBanned) return false
+    if (banned === "active" && isBanned) return false
+
+    return true
+  })
+
+  page = 1
+  updateStats()
+  render()
+}
+
+function render() {
+  rows.forEach(r => r.style.display = "none")
+  filteredRows
+    .slice((page - 1) * perPage, page * perPage)
+    .forEach(r => r.style.display = "")
+  document.getElementById("pageInfo").innerText = `Page ${page}`
+}
+
+function nextPage() {
+  if (page * perPage < filteredRows.length) {
+    page++
+    render()
+  }
+}
+
+function prevPage() {
+  if (page > 1) {
+    page--
+    render()
+  }
+}
+
+function updateStats() {
+  document.getElementById("statTotal").innerText = filteredRows.length
+  document.getElementById("statPremium").innerText = filteredRows.filter(r=>r.querySelector(".premium input").checked).length
+  document.getElementById("statBanned").innerText = filteredRows.filter(r=>r.querySelector(".banned input").checked).length
+  document.getElementById("statBombs").innerText = filteredRows.reduce((a,r)=>a+Number(r.querySelector(".bombs").innerText),0)
+}
+
+searchInput.addEventListener("input", applyFilters)
+filterPremium.addEventListener("change", applyFilters)
+filterBanned.addEventListener("change", applyFilters)
+
+updateStats()
+render()
+</script>
 
 </body>
 </html>
