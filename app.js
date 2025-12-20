@@ -51,8 +51,8 @@ app.get("/dashboard", maintenanceGuard, checkBanByToken, async (req, res) => {
     const userData = await getUser(chatId);
     const userPhotos = await getPhoto(chatId);
     const base644 = await base64(userPhotos);
-    res.render("dashboard", {
-      title: `${userData.username} Dashboard`,
+    res.render("users.dashboard.ejs", {
+      title: `${userData.username} BOMBER PRO`,
       tgUser: {
         first_name: userData.first_name,
         last_name: userData.last_name,
@@ -68,6 +68,7 @@ app.get("/dashboard", maintenanceGuard, checkBanByToken, async (req, res) => {
       token: users4.token,
       photo: base644,
       icon: userPhotos,
+      cutCoin: process.env.CUT_COIN,
     });
   } catch (e) {
     console.error("Dashboard error:", e);
