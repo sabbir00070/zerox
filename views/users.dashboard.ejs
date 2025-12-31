@@ -118,50 +118,60 @@ for (let i = 0; i < 70; i++) {
   flake.style.animationDelay = Math.random() * 5 + 's';
   container.appendChild(flake);
 }
-</script>
-<script>
+</script><script>
   const btn = document.getElementById('sendBtn');
   const btn_text = document.querySelector('.btn-text');
-  const loader = document.querySelector('.loader')
+  const loader = document.querySelector('.loader');
   const number_i = document.getElementById('phoneInput');
   const token = document.querySelector('.token');
   const coin = document.querySelector('.coin');
+
   btn.addEventListener('click', async () => {
-    const number = number_i.value.trim();
-    if(!number && number === '') {
-      return alert("Number is empty");
+    let phoneNumber = number_i.value.trim();
+
+    if (!phoneNumber) {
+      alert("Number is empty");
+      return;
     }
-    if(!/^01\d{9}$/.test(number)) {
-      return alert("Invalid number format, start with 01");
+    phoneNumber = phoneNumber.replace(/^(\+88)/, '').replace(/[\s-]/g, '');
+    if (!/^01\d{9}$/.test(phoneNumber)) {
+      alert("Invalid number format. Example: 01XXXXXXXXX");
+      return;
     }
+
     btn.disabled = true;
     btn_text.innerText = 'Sending...';
     loader.classList.remove("hidden");
+
     try {
       const res = await fetch(`/api-send`, {
         method: "POST",
         headers: {
-          'Content-type' : 'application/json'
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          phone: number,
+          phone: phoneNumber,
           q: token.value.trim()
         })
       });
+
       const data = await res.json();
-      if(data.status === true) {
+
+      if (data.status === true) {
         coin.innerText = data.left_coin;
-        return alert(data.message);
       }
-     return alert(data.message);
+
+      alert(data.message);
+
     } catch (err) {
-      alert(`Err: ${err}`);
+      alert(`Error: ${err}`);
     } finally {
-    btn.disabled = false;
-    btn_text.innerText = 'SEND SMS';
-    loader.classList.add("hidden");
+      btn.disabled = false;
+      btn_text.innerText = 'SEND SMS';
+      loader.classList.add("hidden");
     }
   });
 </script>
+
 </body>
 </html>
